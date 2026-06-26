@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "description": "Placeholder for the top 1,000 American baby names along with their IPA metadata. Populate with additional entries keyed by lowercase normalized forms.",
+    "note": "Add entries like {\"olivia\": {\"phones\": [...], \"ipa\": \"...\"}} so the transliterator can reuse exact IPA data. This file currently ships with a few samples for testing."
+  },
+  "olivia": {
+    "phones": ["AH0", "L", "IH1", "V", "IY0", "AH0"],
+    "ipa": "əˈlɪviə"
+  },
+  "liam": {
+    "phones": ["L", "IY1", "AH0", "M"],
+    "ipa": "ˈliːəm"
+  },
+  "emma": {
+    "phones": ["EH1", "M", "AH0"],
+    "ipa": "ˈɛmə"
+  }
+}

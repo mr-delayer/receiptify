@@ -1,0 +1,12 @@
+name = "receiptify"
+main = "src/worker.py"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["python_workers"]
+
+# Bundle the JSON data files (examples, IPA dictionaries) so the Python
+# Worker can open()/read them at runtime. Without this, only worker.py is
+# uploaded and every open(*.json) fails in production.
+[[rules]]
+type = "Data"
+globs = ["**/*.json"]
+fallthrough = true

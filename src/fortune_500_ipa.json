@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "description": "Placeholder for Fortune 500 company names and IPA data. Please fill with the full list (lowercase keys) once you have the curated IPA pronunciations.",
+    "note": "Entries should follow the {\"company\": {\"phones\": [...], \"ipa\": \"...\"}} shape; a handful of samples are provided to verify the loader."
+  },
+  "walmart": {
+    "phones": ["W", "AO1", "L", "M", "AA0", "R", "T"],
+    "ipa": "ˈwɔːlmɑːrt"
+  },
+  "apple": {
+    "phones": ["AE1", "P", "AH0", "L"],
+    "ipa": "ˈæpəl"
+  },
+  "google": {
+    "phones": ["G", "UW1", "G", "AH0", "L"],
+    "ipa": "ˈɡuːɡəl"
+  }
+}

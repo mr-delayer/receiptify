@@ -1,0 +1,11 @@
+{
+	  "name": "receiptify",
+	    "private": true,
+	      "devDependencies": {
+		          "wrangler": "^3.100.0"
+			    },
+			      "scripts": {
+				          "dev": "wrangler dev",
+					      "deploy": "wrangler deploy"
+					        }
+}

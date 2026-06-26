@@ -1,0 +1,53 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+build/
+dist/
+pip-wheel-metadata/
+*.spec
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+.python-version
+
+# Testing & coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Node / package managers
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+npm-debug.log*
+
+# Cloudflare Wrangler local state
+.wrangler/
+
+# IDE/editor detritus
+.idea/
+.vscode/
+*.swp
+*.swo
+*.code-workspace
+*.iml
+.claude/
+.opencode/
+.codex/
+codex.log
+
+# OS junk
+.DS_Store
+Thumbs.db
