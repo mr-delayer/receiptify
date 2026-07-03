@@ -83,7 +83,8 @@ Wrangler bundles the Python/JS runtime, attaches the JSON data modules, and publ
 - Orientation options:
   - **Horizontal** – Rotates glyphs clockwise before sampling.
   - **Vertical** – Keeps glyphs upright and compresses spacing vertically.
-- Font options include bold sans-serif (default), serif, Comic Sans, script, and Gothic/blackletter stacks.
+- Font options include bold sans-serif (default), serif, Comic Neue, script, and Gothic/blackletter stacks.
+- Adjust font size and weight to fine-tune the rendered glyphs.
 - Long input is chunked into multiple 33-line blocks, each with its own copy button.
 
 ## API Usage

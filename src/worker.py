@@ -1040,6 +1040,7 @@ HTML = r"""<!DOCTYPE html>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
 
   <style>
@@ -1136,6 +1137,48 @@ HTML = r"""<!DOCTYPE html>
       box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.16);
     }
 
+    input[type="range"] {
+      width: 100%;
+      accent-color: #dc2626;
+      height: 6px;
+      border-radius: 999px;
+      background: color-mix(in srgb, canvasText 14%, transparent);
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #dc2626;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.35);
+      cursor: pointer;
+      border: 0;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #dc2626;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.35);
+      cursor: pointer;
+      border: 0;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: color-mix(in srgb, canvasText 18%, transparent);
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 6px;
+      border-radius: 999px;
+      background: color-mix(in srgb, canvasText 18%, transparent);
+    }
+
     .check-row {
       display: flex;
       align-items: center;
@@ -1156,6 +1199,84 @@ HTML = r"""<!DOCTYPE html>
       flex-wrap: wrap;
       align-items: center;
       margin-top: 16px;
+    }
+
+    details.bigtext-panel {
+      margin-top: 20px;
+      border: 1px solid color-mix(in srgb, canvasText 14%, transparent);
+      border-radius: 18px;
+      background: color-mix(in srgb, canvas 94%, canvasText 6%);
+      overflow: hidden;
+    }
+
+    details.bigtext-panel summary {
+      padding: 16px 20px;
+      cursor: pointer;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      list-style: none;
+    }
+
+    details.bigtext-panel summary::marker,
+    details.bigtext-panel summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.bigtext-panel summary::after {
+      content: ">";
+      font-weight: 700;
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+
+    details.bigtext-panel[open] summary {
+      border-bottom: 1px solid color-mix(in srgb, canvasText 12%, transparent);
+    }
+
+    details.bigtext-panel[open] summary::after {
+      transform: rotate(90deg);
+    }
+
+    .bigtext-panel-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .bigtext-panel-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .bigtext-control {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1 1 200px;
+      min-width: 200px;
+    }
+
+    .bigtext-control label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 0;
+    }
+
+    .bigtext-control select {
+      width: 100%;
+    }
+
+    .slider-value {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: color-mix(in srgb, canvasText 55%, transparent);
     }
 
     button {
@@ -1485,30 +1606,49 @@ HTML = r"""<!DOCTYPE html>
         </p>
       </details>
 
-      <div class="row">
-        <label for="bigtext-font">Font</label>
-        <select id="bigtext-font">
-          <option value="sans" selected>Bold Sans</option>
-          <option value="serif">Classic Serif</option>
-          <option value="comic">Comic Sans</option>
-          <option value="script">Handwritten Script</option>
-          <option value="gothic">Gothic Blackletter</option>
-        </select>
-      </div>
-
-      <div class="row bigtext-options">
-        <label class="toggle">
-          <input type="radio" name="bigtext-orientation" value="horizontal" checked>
-          Horizontal
-        </label>
-        <label class="toggle">
-          <input type="radio" name="bigtext-orientation" value="vertical">
-          Vertical
-        </label>
-      </div>
+      <details class="bigtext-panel">
+        <summary>Font &amp; formatting</summary>
+        <div class="bigtext-panel-body">
+          <div class="bigtext-control bigtext-font">
+            <label for="bigtext-font">Font</label>
+            <select id="bigtext-font">
+              <option value="sans" selected>Bold Sans</option>
+              <option value="serif">Classic Serif</option>
+              <option value="comic">Comic Neue</option>
+              <option value="script">Handwritten Script</option>
+              <option value="gothic">Gothic Blackletter</option>
+            </select>
+          </div>
+          <div class="bigtext-panel-grid">
+            <div class="bigtext-control">
+              <label for="bigtext-font-size">Font size <span class="slider-value" id="bigtext-font-size-value">80px</span></label>
+              <input id="bigtext-font-size" type="range" min="20" max="200" step="2" value="80">
+            </div>
+            <div class="bigtext-control">
+              <label for="bigtext-font-weight">Font weight <span class="slider-value" id="bigtext-font-weight-value">600</span></label>
+              <input id="bigtext-font-weight" type="range" min="100" max="900" step="50" value="600">
+            </div>
+            <div class="bigtext-control">
+              <label for="bigtext-letter-spacing">Letter spacing <span class="slider-value" id="bigtext-letter-spacing-value">0px</span></label>
+              <input id="bigtext-letter-spacing" type="range" min="-50" max="60" step="1" value="0">
+            </div>
+          </div>
+          <div class="row bigtext-options">
+            <label class="toggle">
+              <input type="radio" name="bigtext-orientation" value="horizontal" checked>
+              Horizontal
+            </label>
+            <label class="toggle">
+              <input type="radio" name="bigtext-orientation" value="vertical">
+              Vertical
+            </label>
+          </div>
+        </div>
+      </details>
 
       <div class="row">
         <button id="bigtext-convert" type="button">Generate big text</button>
+        <button id="bigtext-reset" type="button">Reset defaults</button>
         <span class="hint" id="bigtext-status"></span>
       </div>
 
@@ -1703,17 +1843,15 @@ HTML = r"""<!DOCTYPE html>
       }
 
       let raw = "";
-      let prevSpace = false;
       // Art fills the first ART_H - 1 = 32 lines; line 33 is the fixed footer.
       for (let y = 0; y < ART_H - 1; y++) {
         const row = tile[y % tileH]; // wrap -> vertical tiling
         for (let x = 0; x < ART_W; x++) {
           let ch = ART_RAMP[row[x]];
-          if (ch === " " && prevSpace) {
-            ch = ART_FILLER; // never allow two adjacent spaces (incl. seams)
+          if (ch === " ") {
+            ch = ART_FILLER; // replace all spaces except the footer
           }
           raw += ch;
-          prevSpace = ch === " ";
         }
       }
       raw += ART_FOOTER; // " Cheer100 丶一二三丁" as the last line
@@ -1784,23 +1922,52 @@ HTML = r"""<!DOCTYPE html>
     // before sampling; vertical orientation keeps them upright and scales each
     // glyph to span the strip width. Long text is split into independent 15x33
     // chunks, each copyable on its own. Reuses ART_W/ART_H/ART_RAMP/ART_FILLER
-    // and the brightness ramp + no-double-space rules from image mode. Copy
+    // and the brightness ramp + space-substitution rules from image mode. Copy
     // buffers are raw 495-char strings, no newlines.
     const bigtextInput = document.querySelector("#bigtext-input");
     const bigtextConvert = document.querySelector("#bigtext-convert");
     const bigtextStatus = document.querySelector("#bigtext-status");
     const bigtextOutput = document.querySelector("#bigtext-output");
     const bigtextFontSelect = document.querySelector("#bigtext-font");
+    const bigtextFontSizeInput = document.querySelector("#bigtext-font-size");
+    const bigtextFontWeightInput = document.querySelector("#bigtext-font-weight");
     const bigtextOrientationInputs = document.querySelectorAll('input[name="bigtext-orientation"]');
+    const bigtextLetterSpacingInput = document.querySelector("#bigtext-letter-spacing");
+    const bigtextFontSizeValue = document.querySelector("#bigtext-font-size-value");
+    const bigtextFontWeightValue = document.querySelector("#bigtext-font-weight-value");
+    const bigtextLetterSpacingValue = document.querySelector("#bigtext-letter-spacing-value");
+    const bigtextResetButton = document.querySelector("#bigtext-reset");
     // Font stacks for big text rendering; each entry falls back through
     // commonly available families to keep glyph coverage broad.
     const BIGTEXT_FONT_MAP = {
       sans: '"Arial Black", "Noto Sans CJK SC", system-ui, sans-serif',
       serif: '"Playfair Display", "Times New Roman", "Songti SC", serif',
-      comic: '"Comic Sans MS", "Comic Neue", "Marker Felt", cursive',
+      comic: '"Comic Neue", "Comic Sans MS", "Marker Felt", cursive',
       script: '"Lucida Handwriting", "Brush Script MT", "KaiTi", cursive',
       gothic: '"UnifrakturCook", "Old English Text MT", "Gothic A1", serif'
     };
+    const BIGTEXT_FONT_DEFAULT_WEIGHT = {
+      sans: 600,
+      serif: 700,
+      comic: 600,
+      script: 500,
+      gothic: 700
+    };
+    const BIGTEXT_DEFAULT_WEIGHT = 600;
+    const BIGTEXT_DEFAULT_SIZE = 80;
+    const BIGTEXT_MIN_SIZE = 20;
+    const BIGTEXT_MAX_SIZE = 200;
+    const BIGTEXT_MIN_WEIGHT = 100;
+    const BIGTEXT_MAX_WEIGHT = 900;
+    const BIGTEXT_DEFAULT_LETTER_SPACING = 0;
+    const BIGTEXT_MIN_LETTER_SPACING = -50;
+    const BIGTEXT_MAX_LETTER_SPACING = 60;
+    const BIGTEXT_FORBIDDEN_CHAR = "一";
+    const BIGTEXT_SUBSTITUTE_CHAR = "丿";
+    const BIGTEXT_RAMP = ART_RAMP.map(ch =>
+      ch === BIGTEXT_FORBIDDEN_CHAR ? BIGTEXT_SUBSTITUTE_CHAR : ch
+    );
+    const BIGTEXT_FOOTER = ART_FOOTER.split(BIGTEXT_FORBIDDEN_CHAR).join(BIGTEXT_SUBSTITUTE_CHAR);
     const COPY_ICON =
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
       'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' +
@@ -1808,6 +1975,51 @@ HTML = r"""<!DOCTYPE html>
       '</rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1">' +
       '</path></svg>';
     const BIGTEXT_MAX_RENDER_ROWS = 4096;
+    let bigtextWeightWasEdited = false;
+    let bigtextCurrentFontKey = "sans";
+
+    function updateSliderDisplay(inputEl, outputEl, formatter = (value) => String(value)) {
+      if (!inputEl || !outputEl) return;
+      const numeric = Number(inputEl.value);
+      const source = Number.isFinite(numeric) ? numeric : inputEl.value;
+      outputEl.textContent = formatter(source);
+    }
+
+    function formatPx(value) {
+      const numeric = Number(value);
+      return (Number.isFinite(numeric) ? Math.round(numeric) : value) + "px";
+    }
+
+    function formatNumber(value) {
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? Math.round(numeric).toString() : String(value);
+    }
+
+    function resetBigtextControls() {
+      if (bigtextFontSelect) {
+        bigtextFontSelect.value = "sans";
+      }
+      bigtextCurrentFontKey = getBigtextFontKey();
+      if (bigtextFontSizeInput) {
+        bigtextFontSizeInput.value = BIGTEXT_DEFAULT_SIZE;
+        updateSliderDisplay(bigtextFontSizeInput, bigtextFontSizeValue, formatPx);
+      }
+      if (bigtextFontWeightInput) {
+        const defaultWeight = getBigtextDefaultWeight(bigtextCurrentFontKey);
+        bigtextFontWeightInput.value = defaultWeight;
+        bigtextWeightWasEdited = false;
+        updateSliderDisplay(bigtextFontWeightInput, bigtextFontWeightValue, formatNumber);
+      }
+      if (bigtextLetterSpacingInput) {
+        bigtextLetterSpacingInput.value = BIGTEXT_DEFAULT_LETTER_SPACING;
+        updateSliderDisplay(bigtextLetterSpacingInput, bigtextLetterSpacingValue, formatPx);
+      }
+      const defaultOrientation = "horizontal";
+      bigtextOrientationInputs.forEach(input => {
+        input.checked = input.value === defaultOrientation;
+      });
+      maybeRegenerateBigText();
+    }
 
     function getBigtextOrientation() {
       for (const input of bigtextOrientationInputs) {
@@ -1823,29 +2035,113 @@ HTML = r"""<!DOCTYPE html>
       return Object.prototype.hasOwnProperty.call(BIGTEXT_FONT_MAP, value) ? value : "sans";
     }
 
-    function resolveBigtextFont(fontKey) {
-      const key = Object.prototype.hasOwnProperty.call(BIGTEXT_FONT_MAP, fontKey) ? fontKey : "sans";
-      const family = BIGTEXT_FONT_MAP[key];
-      const weightMap = {
-        sans: 600,
-        serif: 700,
-        comic: 600,
-        script: 500,
-        gothic: 700
-      };
-      const weight = weightMap[key] || 600;
-      return { key, family, weight };
+    function getBigtextDefaultWeight(fontKey) {
+      const key = Object.prototype.hasOwnProperty.call(BIGTEXT_FONT_DEFAULT_WEIGHT, fontKey)
+        ? fontKey
+        : "sans";
+      return BIGTEXT_FONT_DEFAULT_WEIGHT[key] || BIGTEXT_DEFAULT_WEIGHT;
     }
 
-    function makeChunkAccumulator() {
+    function resolveBigtextFont(fontKey, explicitWeight) {
+      const key = Object.prototype.hasOwnProperty.call(BIGTEXT_FONT_MAP, fontKey) ? fontKey : "sans";
+      const family = BIGTEXT_FONT_MAP[key];
+      const defaultWeight = getBigtextDefaultWeight(key);
+      let weight = defaultWeight;
+      if (Number.isFinite(explicitWeight)) {
+        const clamped = Math.round(
+          Math.min(BIGTEXT_MAX_WEIGHT, Math.max(BIGTEXT_MIN_WEIGHT, explicitWeight))
+        );
+        weight = clamped;
+      }
+      return { key, family, weight, defaultWeight };
+    }
+
+    function getBigtextFontSize() {
+      if (!bigtextFontSizeInput) {
+        return BIGTEXT_DEFAULT_SIZE;
+      }
+      const raw = Number.parseFloat(bigtextFontSizeInput.value || "");
+      if (!Number.isFinite(raw)) {
+        bigtextFontSizeInput.value = BIGTEXT_DEFAULT_SIZE;
+        updateSliderDisplay(bigtextFontSizeInput, bigtextFontSizeValue, formatPx);
+        return BIGTEXT_DEFAULT_SIZE;
+      }
+      const clamped = Math.round(
+        Math.min(BIGTEXT_MAX_SIZE, Math.max(BIGTEXT_MIN_SIZE, raw))
+      );
+      if (clamped !== raw) {
+        bigtextFontSizeInput.value = clamped;
+      }
+      updateSliderDisplay(bigtextFontSizeInput, bigtextFontSizeValue, formatPx);
+      return clamped;
+    }
+
+    function getBigtextFontWeight(fontKey) {
+      const defaultWeight = getBigtextDefaultWeight(fontKey);
+      if (!bigtextFontWeightInput) {
+        return defaultWeight;
+      }
+      const rawValue = (bigtextFontWeightInput.value || "").trim();
+      if (!rawValue) {
+        bigtextFontWeightInput.value = defaultWeight;
+        bigtextWeightWasEdited = false;
+        updateSliderDisplay(bigtextFontWeightInput, bigtextFontWeightValue, formatNumber);
+        return defaultWeight;
+      }
+      const parsed = Number.parseInt(rawValue, 10);
+      if (!Number.isFinite(parsed)) {
+        bigtextFontWeightInput.value = defaultWeight;
+        bigtextWeightWasEdited = false;
+        updateSliderDisplay(bigtextFontWeightInput, bigtextFontWeightValue, formatNumber);
+        return defaultWeight;
+      }
+      const clamped = Math.round(
+        Math.min(BIGTEXT_MAX_WEIGHT, Math.max(BIGTEXT_MIN_WEIGHT, parsed))
+      );
+      if (clamped !== parsed) {
+        bigtextFontWeightInput.value = clamped;
+      }
+      updateSliderDisplay(bigtextFontWeightInput, bigtextFontWeightValue, formatNumber);
+      return clamped;
+    }
+
+    function getBigtextLetterSpacing() {
+      if (!bigtextLetterSpacingInput) {
+        return BIGTEXT_DEFAULT_LETTER_SPACING;
+      }
+      const raw = Number.parseFloat(bigtextLetterSpacingInput.value || "");
+      if (!Number.isFinite(raw)) {
+        bigtextLetterSpacingInput.value = BIGTEXT_DEFAULT_LETTER_SPACING;
+        updateSliderDisplay(bigtextLetterSpacingInput, bigtextLetterSpacingValue, formatPx);
+        return BIGTEXT_DEFAULT_LETTER_SPACING;
+      }
+      const clamped = Math.round(
+        Math.min(BIGTEXT_MAX_LETTER_SPACING, Math.max(BIGTEXT_MIN_LETTER_SPACING, raw))
+      );
+      if (clamped !== raw) {
+        bigtextLetterSpacingInput.value = clamped;
+      }
+      updateSliderDisplay(bigtextLetterSpacingInput, bigtextLetterSpacingValue, formatPx);
+      return clamped;
+    }
+
+    bigtextCurrentFontKey = getBigtextFontKey();
+    updateSliderDisplay(bigtextFontSizeInput, bigtextFontSizeValue, formatPx);
+    updateSliderDisplay(bigtextFontWeightInput, bigtextFontWeightValue, formatNumber);
+    updateSliderDisplay(bigtextLetterSpacingInput, bigtextLetterSpacingValue, formatPx);
+
+    function makeChunkAccumulator(footer = ART_FOOTER) {
       const bodyHeight = ART_H - 1;
       const fillerRow = ART_FILLER.repeat(ART_W);
+      const fillerChunkBody = fillerRow.repeat(bodyHeight);
       const chunks = [];
       let chunkBody = "";
       let rowsInChunk = 0;
 
       function emitChunk() {
-        chunks.push(chunkBody + ART_FOOTER);
+        if (chunkBody !== fillerChunkBody) {
+          chunks.push(chunkBody + footer);
+        }
         chunkBody = "";
         rowsInChunk = 0;
       }
@@ -1876,60 +2172,86 @@ HTML = r"""<!DOCTYPE html>
       return { pushRow, finalize, chunks };
     }
 
-    function buildBigChunks(text, orientation, fontKey) {
-      const content = text.replace(/^\s+|\s+$/g, "");
-      if (!content) return [];
-      return orientation === "vertical"
-        ? buildVerticalChunks(content, fontKey)
-        : buildHorizontalChunks(content, fontKey);
+    const GRAPHEME_SEGMENTER = typeof Intl !== "undefined" && Intl.Segmenter
+      ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
+      : null;
+
+    function splitGraphemes(value) {
+      if (!value) return [];
+      if (GRAPHEME_SEGMENTER) {
+        return Array.from(GRAPHEME_SEGMENTER.segment(value), segment => segment.segment);
+      }
+      return Array.from(value);
     }
 
-    function buildHorizontalChunks(content, fontKey) {
-      const F = 80;
-      const { family, weight } = resolveBigtextFont(fontKey);
+    function buildBigChunks(text, orientation, fontKey, fontSize, fontWeight, letterSpacing) {
+      const trimmed = text.replace(/^\s+|\s+$/g, "");
+      if (!trimmed) return [];
+      const glyphs = splitGraphemes(trimmed);
+      return orientation === "vertical"
+        ? buildVerticalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing)
+        : buildHorizontalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing);
+    }
+
+    function buildHorizontalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing) {
+      const F = Number.isFinite(fontSize)
+        ? Math.max(BIGTEXT_MIN_SIZE, Math.min(BIGTEXT_MAX_SIZE, Math.round(fontSize)))
+        : BIGTEXT_DEFAULT_SIZE;
+      const spacing = Number.isFinite(letterSpacing)
+        ? Math.max(BIGTEXT_MIN_LETTER_SPACING, Math.min(BIGTEXT_MAX_LETTER_SPACING, letterSpacing))
+        : BIGTEXT_DEFAULT_LETTER_SPACING;
+      const { family, weight } = resolveBigtextFont(fontKey, fontWeight);
       const font = weight + " " + F + "px " + family;
       const pad = Math.round(F * 0.08);
       const textH = Math.ceil(F * 1.2);
       const scale = ART_W / textH;
+      const ramp = BIGTEXT_RAMP;
 
       const measureCanvas = document.createElement("canvas");
       const measureCtx = measureCanvas.getContext("2d");
       measureCtx.font = font;
 
-      const charWidths = [];
-      for (let i = 0; i < content.length; i++) {
-        charWidths.push(measureCtx.measureText(content[i]).width);
-      }
+      const charWidths = glyphs.map(ch => measureCtx.measureText(ch).width);
 
       const prefixWidths = [0];
       for (let i = 0; i < charWidths.length; i++) {
         prefixWidths[i + 1] = prefixWidths[i] + charWidths[i];
       }
 
+      function measureRange(start, end) {
+        if (end <= start) return 0;
+        const width = prefixWidths[end] - prefixWidths[start];
+        const gaps = Math.max(0, end - start - 1);
+        return width + gaps * spacing;
+      }
+
       const tmp = document.createElement("canvas");
       const sample = document.createElement("canvas");
       const segments = [];
       let start = 0;
-      while (start < content.length) {
+      while (start < glyphs.length) {
         let end = start;
-        while (end < content.length) {
-          const approxWidth = prefixWidths[end + 1] - prefixWidths[start];
+        while (end < glyphs.length) {
+          const nextEnd = end + 1;
+          const approxWidth = measureRange(start, nextEnd);
           const rows = Math.max(1, Math.round((approxWidth + pad * 2) * scale));
           if (rows > BIGTEXT_MAX_RENDER_ROWS) break;
-          end += 1;
+          end = nextEnd;
         }
         if (end === start) end = start + 1;
         segments.push([start, end]);
         start = end;
       }
 
-      const acc = makeChunkAccumulator();
+      const acc = makeChunkAccumulator(BIGTEXT_FOOTER);
 
-      function sampleSegment(segmentText, padLeft, padRight) {
+      function sampleSegment(segmentStart, segmentEnd, padLeft, padRight) {
+        const segmentText = glyphs.slice(segmentStart, segmentEnd).join("");
         const targetWidth = Math.max(
           1,
-          Math.ceil(measureCtx.measureText(segmentText).width) + padLeft + padRight
+          Math.ceil(measureRange(segmentStart, segmentEnd)) + padLeft + padRight
         );
+
         tmp.width = targetWidth;
         tmp.height = textH;
         const tctx = tmp.getContext("2d");
@@ -1939,7 +2261,18 @@ HTML = r"""<!DOCTYPE html>
         tctx.fillStyle = "#ffffff";
         tctx.fillRect(0, 0, targetWidth, textH);
         tctx.fillStyle = "#000000";
-        tctx.fillText(segmentText, padLeft, textH / 2);
+
+        let cursor = padLeft;
+        for (let i = segmentStart; i < segmentEnd; i++) {
+          const ch = glyphs[i];
+          const width = charWidths[i] || measureCtx.measureText(ch).width;
+          tctx.fillText(ch, cursor, textH / 2);
+          if (i === segmentEnd - 1) {
+            cursor += width;
+          } else {
+            cursor += width + spacing;
+          }
+        }
 
         const rows = Math.max(1, Math.round(targetWidth * scale));
         sample.width = ART_W;
@@ -1956,7 +2289,7 @@ HTML = r"""<!DOCTYPE html>
         sctx.restore();
 
         const pixels = sctx.getImageData(0, 0, ART_W, rows).data;
-        const maxIndex = ART_RAMP.length - 1;
+        const maxIndex = ramp.length - 1;
         const segmentRows = [];
         for (let y = 0; y < rows; y++) {
           let row = "";
@@ -1969,18 +2302,17 @@ HTML = r"""<!DOCTYPE html>
             let idx = Math.round((1 - lum / 255) * maxIndex);
             if (idx < 0) idx = 0;
             if (idx > maxIndex) idx = maxIndex;
-            row += ART_RAMP[idx];
+            row += ramp[idx];
           }
           segmentRows.push(row);
         }
         return segmentRows;
       }
 
-      segments.forEach(([start, end], index) => {
-        const segmentText = content.slice(start, end);
+      segments.forEach(([segmentStart, segmentEnd], index) => {
         const padLeft = index === 0 ? pad : 0;
         const padRight = index === segments.length - 1 ? pad : 0;
-        const segmentRows = sampleSegment(segmentText, padLeft, padRight);
+        const segmentRows = sampleSegment(segmentStart, segmentEnd, padLeft, padRight);
         segmentRows.forEach(row => acc.pushRow(row));
       });
 
@@ -1988,15 +2320,21 @@ HTML = r"""<!DOCTYPE html>
       return acc.chunks;
     }
 
-    function buildVerticalChunks(content, fontKey) {
-      const F = 80;
-      const { family, weight } = resolveBigtextFont(fontKey);
+    function buildVerticalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing) {
+      const F = Number.isFinite(fontSize)
+        ? Math.max(BIGTEXT_MIN_SIZE, Math.min(BIGTEXT_MAX_SIZE, Math.round(fontSize)))
+        : BIGTEXT_DEFAULT_SIZE;
+      const spacing = Number.isFinite(letterSpacing)
+        ? Math.max(BIGTEXT_MIN_LETTER_SPACING, Math.min(BIGTEXT_MAX_LETTER_SPACING, letterSpacing))
+        : BIGTEXT_DEFAULT_LETTER_SPACING;
+      const { family, weight } = resolveBigtextFont(fontKey, fontWeight);
       const font = weight + " " + F + "px " + family;
       const padX = Math.max(2, Math.round(F * 0.02));
       const padY = Math.round(F * 0.1);
       const drawHeight = Math.ceil(F * 1.2) + padY * 2;
       const fillerRow = ART_FILLER.repeat(ART_W);
       const VERTICAL_HEIGHT_FACTOR = 0.8;
+      const ramp = BIGTEXT_RAMP;
 
       const measureCanvas = document.createElement("canvas");
       const measureCtx = measureCanvas.getContext("2d");
@@ -2004,12 +2342,12 @@ HTML = r"""<!DOCTYPE html>
 
       const tmp = document.createElement("canvas");
       const sample = document.createElement("canvas");
-      const acc = makeChunkAccumulator();
+      const acc = makeChunkAccumulator(BIGTEXT_FOOTER);
 
-      for (let i = 0; i < content.length; i++) {
-        const glyph = content[i];
+      for (let i = 0; i < glyphs.length; i++) {
+        const glyph = glyphs[i];
         if (glyph === "\r") continue;
-        const nextGlyph = i + 1 < content.length ? content[i + 1] : null;
+        const nextGlyph = i + 1 < glyphs.length ? glyphs[i + 1] : null;
 
         if (glyph === "\n") {
           if (nextGlyph !== null) {
@@ -2061,7 +2399,7 @@ HTML = r"""<!DOCTYPE html>
         sctx.restore();
 
         const pixels = sctx.getImageData(0, 0, ART_W, rows).data;
-        const maxIndex = ART_RAMP.length - 1;
+        const maxIndex = ramp.length - 1;
 
         const rowData = [];
         for (let y = 0; y < rows; y++) {
@@ -2077,7 +2415,7 @@ HTML = r"""<!DOCTYPE html>
             if (idx < 0) idx = 0;
             if (idx > maxIndex) idx = maxIndex;
             if (idx !== 0) blank = false;
-            row += ART_RAMP[idx];
+            row += ramp[idx];
           }
           rowData.push({ row, blank });
         }
@@ -2097,8 +2435,12 @@ HTML = r"""<!DOCTYPE html>
           acc.pushRow(fillerRow);
         }
 
-        if (nextGlyph !== null && nextGlyph !== "\r" && nextGlyph !== "\n" && nextGlyph !== " ") {
-          acc.pushRow(fillerRow);
+        const shouldAddGap = nextGlyph !== null && nextGlyph !== "\r" && nextGlyph !== "\n" && nextGlyph !== " ";
+        if (shouldAddGap) {
+          const gapRows = 1 + Math.max(0, Math.round(spacing * scale));
+          for (let g = 0; g < gapRows; g++) {
+            acc.pushRow(fillerRow);
+          }
         }
       }
 
@@ -2162,7 +2504,17 @@ HTML = r"""<!DOCTYPE html>
     function generateBigText() {
       const orientation = getBigtextOrientation();
       const fontKey = getBigtextFontKey();
-      const chunks = buildBigChunks(bigtextInput.value, orientation, fontKey);
+      const fontSize = getBigtextFontSize();
+      const fontWeight = getBigtextFontWeight(fontKey);
+      const letterSpacing = getBigtextLetterSpacing();
+      const chunks = buildBigChunks(
+        bigtextInput.value,
+        orientation,
+        fontKey,
+        fontSize,
+        fontWeight,
+        letterSpacing
+      );
       if (!chunks.length) {
         bigtextOutput.replaceChildren();
         bigtextStatus.textContent = "Enter some text first.";
@@ -2175,20 +2527,72 @@ HTML = r"""<!DOCTYPE html>
 
     bigtextConvert.addEventListener("click", generateBigText);
 
+    function maybeRegenerateBigText() {
+      if (!bigtextInput.value.trim()) return;
+      if (!bigtextOutput.childElementCount) return;
+      generateBigText();
+    }
+
     bigtextOrientationInputs.forEach(input => {
       input.addEventListener("change", () => {
         if (!input.checked) return;
-        if (!bigtextInput.value.trim()) return;
-        if (!bigtextOutput.childElementCount) return;
-        generateBigText();
+        maybeRegenerateBigText();
       });
     });
 
     if (bigtextFontSelect) {
       bigtextFontSelect.addEventListener("change", () => {
-        if (!bigtextInput.value.trim()) return;
-        if (!bigtextOutput.childElementCount) return;
-        generateBigText();
+        const nextKey = getBigtextFontKey();
+        if (bigtextFontWeightInput) {
+          const prevDefault = getBigtextDefaultWeight(bigtextCurrentFontKey);
+          const currentParsed = Number.parseInt(bigtextFontWeightInput.value || "", 10);
+          if (!bigtextWeightWasEdited || currentParsed === prevDefault || Number.isNaN(currentParsed)) {
+            const nextDefault = getBigtextDefaultWeight(nextKey);
+            bigtextFontWeightInput.value = nextDefault;
+            bigtextWeightWasEdited = false;
+            updateSliderDisplay(bigtextFontWeightInput, bigtextFontWeightValue, formatNumber);
+          }
+        }
+        bigtextCurrentFontKey = nextKey;
+        maybeRegenerateBigText();
+      });
+    }
+
+    if (bigtextFontSizeInput) {
+      bigtextFontSizeInput.addEventListener("input", () => {
+        updateSliderDisplay(bigtextFontSizeInput, bigtextFontSizeValue, formatPx);
+      });
+      bigtextFontSizeInput.addEventListener("change", () => {
+        updateSliderDisplay(bigtextFontSizeInput, bigtextFontSizeValue, formatPx);
+        maybeRegenerateBigText();
+      });
+    }
+
+    if (bigtextFontWeightInput) {
+      bigtextFontWeightInput.addEventListener("input", () => {
+        bigtextWeightWasEdited = true;
+        updateSliderDisplay(bigtextFontWeightInput, bigtextFontWeightValue, formatNumber);
+      });
+      bigtextFontWeightInput.addEventListener("change", () => {
+        updateSliderDisplay(bigtextFontWeightInput, bigtextFontWeightValue, formatNumber);
+        maybeRegenerateBigText();
+      });
+    }
+
+    if (bigtextLetterSpacingInput) {
+      bigtextLetterSpacingInput.addEventListener("input", () => {
+        updateSliderDisplay(bigtextLetterSpacingInput, bigtextLetterSpacingValue, formatPx);
+      });
+      bigtextLetterSpacingInput.addEventListener("change", () => {
+        updateSliderDisplay(bigtextLetterSpacingInput, bigtextLetterSpacingValue, formatPx);
+        maybeRegenerateBigText();
+      });
+    }
+
+    if (bigtextResetButton) {
+      bigtextResetButton.addEventListener("click", () => {
+        resetBigtextControls();
+        bigtextStatus.textContent = "Controls reset to defaults.";
       });
     }
 
