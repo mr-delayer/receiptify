@@ -1642,6 +1642,14 @@ HTML = r"""<!DOCTYPE html>
               <input type="radio" name="bigtext-orientation" value="vertical">
               Vertical
             </label>
+            <label class="toggle">
+              <input type="checkbox" id="bigtext-latin-toggle">
+              Include wide Latin characters (M, W, &mdash;)
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="bigtext-invert-toggle">
+              Invert (swap ink &amp; blank)
+            </label>
           </div>
         </div>
       </details>
@@ -1932,6 +1940,8 @@ HTML = r"""<!DOCTYPE html>
     const bigtextFontSizeInput = document.querySelector("#bigtext-font-size");
     const bigtextFontWeightInput = document.querySelector("#bigtext-font-weight");
     const bigtextOrientationInputs = document.querySelectorAll('input[name="bigtext-orientation"]');
+    const bigtextLatinToggle = document.querySelector("#bigtext-latin-toggle");
+    const bigtextInvertToggle = document.querySelector("#bigtext-invert-toggle");
     const bigtextLetterSpacingInput = document.querySelector("#bigtext-letter-spacing");
     const bigtextFontSizeValue = document.querySelector("#bigtext-font-size-value");
     const bigtextFontWeightValue = document.querySelector("#bigtext-font-weight-value");
@@ -1968,6 +1978,72 @@ HTML = r"""<!DOCTYPE html>
       ch === BIGTEXT_FORBIDDEN_CHAR ? BIGTEXT_SUBSTITUTE_CHAR : ch
     );
     const BIGTEXT_FOOTER = ART_FOOTER.split(BIGTEXT_FORBIDDEN_CHAR).join(BIGTEXT_SUBSTITUTE_CHAR);
+    // Optional extra glyphs for the brightness ramp: Latin/punctuation characters
+    // that (unlike most Latin letters) keep a fixed ~1em advance width in
+    // proportional fonts, so they stay on-grid when the art is pasted elsewhere.
+    // Each is spliced in next to a Hanzi of comparable ink density.
+    const BIGTEXT_LATIN_INSERTS = [
+      { after: "丶", char: "—" }, // em dash: thin full-width stroke, light
+      { after: "革", char: "M" },      // dense multi-stroke capital, upper-mid
+      { after: "M", char: "W" }        // dense multi-stroke capital, upper-mid
+    ];
+    const BIGTEXT_LATIN_RAMP = BIGTEXT_RAMP.reduce((acc, ch) => {
+      acc.push(ch);
+      // Chase chained inserts (e.g. an insert placed after another insert)
+      // until no further match is found.
+      let last = ch;
+      let matched = true;
+      while (matched) {
+        matched = false;
+        for (const insert of BIGTEXT_LATIN_INSERTS) {
+          if (insert.after === last) {
+            acc.push(insert.char);
+            last = insert.char;
+            matched = true;
+            break;
+          }
+        }
+      }
+      return acc;
+    }, []);
+    const BIGTEXT_MAX_RUN = 3;
+    // Caps consecutive repeats of the same ramp character within the sampled
+    // glyph pixels ("ink") at BIGTEXT_MAX_RUN by nudging overruns to a
+    // neighboring density level. Structural filler/gap rows bypass this.
+    function createRunLimiter(ramp, maxRun) {
+      const indexOf = new Map();
+      ramp.forEach((ch, i) => {
+        if (!indexOf.has(ch)) indexOf.set(ch, i);
+      });
+      let lastChar = null;
+      let run = 0;
+      function limit(ch) {
+        if (ch === lastChar) {
+          run++;
+        } else {
+          lastChar = ch;
+          run = 1;
+        }
+        if (run <= maxRun) {
+          return ch;
+        }
+        const idx = indexOf.has(ch) ? indexOf.get(ch) : -1;
+        const up = idx >= 0 ? ramp[idx + 1] : undefined;
+        const down = idx >= 0 ? ramp[idx - 1] : undefined;
+        const substitute = up && up !== ch ? up : (down && down !== ch ? down : ART_FILLER);
+        lastChar = substitute;
+        run = 1;
+        return substitute;
+      }
+      // Call after pushing structural filler/gap content that bypasses limit(),
+      // so a coincidental match on the far side of a gap isn't mistaken for a
+      // continuation of the run on the near side.
+      limit.reset = function reset() {
+        lastChar = null;
+        run = 0;
+      };
+      return limit;
+    }
     const COPY_ICON =
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
       'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' +
@@ -2018,6 +2094,12 @@ HTML = r"""<!DOCTYPE html>
       bigtextOrientationInputs.forEach(input => {
         input.checked = input.value === defaultOrientation;
       });
+      if (bigtextLatinToggle) {
+        bigtextLatinToggle.checked = false;
+      }
+      if (bigtextInvertToggle) {
+        bigtextInvertToggle.checked = false;
+      }
       maybeRegenerateBigText();
     }
 
@@ -2028,6 +2110,14 @@ HTML = r"""<!DOCTYPE html>
         }
       }
       return "horizontal";
+    }
+
+    function getBigtextIncludeLatin() {
+      return !!(bigtextLatinToggle && bigtextLatinToggle.checked);
+    }
+
+    function getBigtextInvert() {
+      return !!(bigtextInvertToggle && bigtextInvertToggle.checked);
     }
 
     function getBigtextFontKey() {
@@ -2184,16 +2274,16 @@ HTML = r"""<!DOCTYPE html>
       return Array.from(value);
     }
 
-    function buildBigChunks(text, orientation, fontKey, fontSize, fontWeight, letterSpacing) {
+    function buildBigChunks(text, orientation, fontKey, fontSize, fontWeight, letterSpacing, includeLatin, invert) {
       const trimmed = text.replace(/^\s+|\s+$/g, "");
       if (!trimmed) return [];
       const glyphs = splitGraphemes(trimmed);
       return orientation === "vertical"
-        ? buildVerticalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing)
-        : buildHorizontalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing);
+        ? buildVerticalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing, includeLatin, invert)
+        : buildHorizontalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing, includeLatin, invert);
     }
 
-    function buildHorizontalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing) {
+    function buildHorizontalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing, includeLatin, invert) {
       const F = Number.isFinite(fontSize)
         ? Math.max(BIGTEXT_MIN_SIZE, Math.min(BIGTEXT_MAX_SIZE, Math.round(fontSize)))
         : BIGTEXT_DEFAULT_SIZE;
@@ -2205,7 +2295,8 @@ HTML = r"""<!DOCTYPE html>
       const pad = Math.round(F * 0.08);
       const textH = Math.ceil(F * 1.2);
       const scale = ART_W / textH;
-      const ramp = BIGTEXT_RAMP;
+      const ramp = includeLatin ? BIGTEXT_LATIN_RAMP : BIGTEXT_RAMP;
+      const runLimiter = createRunLimiter(ramp, BIGTEXT_MAX_RUN);
 
       const measureCanvas = document.createElement("canvas");
       const measureCtx = measureCanvas.getContext("2d");
@@ -2299,10 +2390,11 @@ HTML = r"""<!DOCTYPE html>
             const lum =
               (0.299 * pixels[p] + 0.587 * pixels[p + 1] + 0.114 * pixels[p + 2]) * a +
               255 * (1 - a);
-            let idx = Math.round((1 - lum / 255) * maxIndex);
+            const brightness = invert ? lum / 255 : 1 - lum / 255;
+            let idx = Math.round(brightness * maxIndex);
             if (idx < 0) idx = 0;
             if (idx > maxIndex) idx = maxIndex;
-            row += ramp[idx];
+            row += runLimiter(ramp[idx]);
           }
           segmentRows.push(row);
         }
@@ -2320,7 +2412,7 @@ HTML = r"""<!DOCTYPE html>
       return acc.chunks;
     }
 
-    function buildVerticalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing) {
+    function buildVerticalChunks(glyphs, fontKey, fontSize, fontWeight, letterSpacing, includeLatin, invert) {
       const F = Number.isFinite(fontSize)
         ? Math.max(BIGTEXT_MIN_SIZE, Math.min(BIGTEXT_MAX_SIZE, Math.round(fontSize)))
         : BIGTEXT_DEFAULT_SIZE;
@@ -2334,7 +2426,8 @@ HTML = r"""<!DOCTYPE html>
       const drawHeight = Math.ceil(F * 1.2) + padY * 2;
       const fillerRow = ART_FILLER.repeat(ART_W);
       const VERTICAL_HEIGHT_FACTOR = 0.8;
-      const ramp = BIGTEXT_RAMP;
+      const ramp = includeLatin ? BIGTEXT_LATIN_RAMP : BIGTEXT_RAMP;
+      const runLimiter = createRunLimiter(ramp, BIGTEXT_MAX_RUN);
 
       const measureCanvas = document.createElement("canvas");
       const measureCtx = measureCanvas.getContext("2d");
@@ -2352,6 +2445,7 @@ HTML = r"""<!DOCTYPE html>
         if (glyph === "\n") {
           if (nextGlyph !== null) {
             acc.pushRow(fillerRow);
+            runLimiter.reset();
           }
           continue;
         }
@@ -2360,6 +2454,7 @@ HTML = r"""<!DOCTYPE html>
           if (nextGlyph !== null) {
             acc.pushRow(fillerRow);
             acc.pushRow(fillerRow);
+            runLimiter.reset();
           }
           continue;
         }
@@ -2411,10 +2506,16 @@ HTML = r"""<!DOCTYPE html>
             const lum =
               (0.299 * pixels[p] + 0.587 * pixels[p + 1] + 0.114 * pixels[p + 2]) * a +
               255 * (1 - a);
-            let idx = Math.round((1 - lum / 255) * maxIndex);
+            // Blank/trim detection always uses the uninverted sense of "no ink
+            // here" -- it's about the glyph's geometric footprint, not display.
+            let geometricIdx = Math.round((1 - lum / 255) * maxIndex);
+            if (geometricIdx < 0) geometricIdx = 0;
+            if (geometricIdx > maxIndex) geometricIdx = maxIndex;
+            if (geometricIdx !== 0) blank = false;
+            const brightness = invert ? lum / 255 : 1 - lum / 255;
+            let idx = Math.round(brightness * maxIndex);
             if (idx < 0) idx = 0;
             if (idx > maxIndex) idx = maxIndex;
-            if (idx !== 0) blank = false;
             row += ramp[idx];
           }
           rowData.push({ row, blank });
@@ -2427,12 +2528,17 @@ HTML = r"""<!DOCTYPE html>
 
         let emittedRows = 0;
         for (let y = start; y < end; y++) {
-          acc.pushRow(rowData[y].row);
+          let limitedRow = "";
+          for (const ch of rowData[y].row) {
+            limitedRow += runLimiter(ch);
+          }
+          acc.pushRow(limitedRow);
           emittedRows++;
         }
 
         if (emittedRows === 0) {
           acc.pushRow(fillerRow);
+          runLimiter.reset();
         }
 
         const shouldAddGap = nextGlyph !== null && nextGlyph !== "\r" && nextGlyph !== "\n" && nextGlyph !== " ";
@@ -2441,6 +2547,7 @@ HTML = r"""<!DOCTYPE html>
           for (let g = 0; g < gapRows; g++) {
             acc.pushRow(fillerRow);
           }
+          runLimiter.reset();
         }
       }
 
@@ -2507,13 +2614,17 @@ HTML = r"""<!DOCTYPE html>
       const fontSize = getBigtextFontSize();
       const fontWeight = getBigtextFontWeight(fontKey);
       const letterSpacing = getBigtextLetterSpacing();
+      const includeLatin = getBigtextIncludeLatin();
+      const invert = getBigtextInvert();
       const chunks = buildBigChunks(
         bigtextInput.value,
         orientation,
         fontKey,
         fontSize,
         fontWeight,
-        letterSpacing
+        letterSpacing,
+        includeLatin,
+        invert
       );
       if (!chunks.length) {
         bigtextOutput.replaceChildren();
@@ -2539,6 +2650,14 @@ HTML = r"""<!DOCTYPE html>
         maybeRegenerateBigText();
       });
     });
+
+    if (bigtextLatinToggle) {
+      bigtextLatinToggle.addEventListener("change", maybeRegenerateBigText);
+    }
+
+    if (bigtextInvertToggle) {
+      bigtextInvertToggle.addEventListener("change", maybeRegenerateBigText);
+    }
 
     if (bigtextFontSelect) {
       bigtextFontSelect.addEventListener("change", () => {
